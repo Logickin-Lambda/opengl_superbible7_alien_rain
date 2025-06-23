@@ -337,7 +337,7 @@ fn process2DArrayTexture(header: *Header, data: []u8) void {
         @intCast(header.glinternalformat),
         @intCast(header.pixelwidth),
         @intCast(header.pixelheight),
-        @intCast(header.pixeldepth),
+        @intCast(header.arrayelements),
     );
 
     gl.TexSubImage3D(
@@ -348,7 +348,7 @@ fn process2DArrayTexture(header: *Header, data: []u8) void {
         0,
         @intCast(header.pixelwidth),
         @intCast(header.pixelheight),
-        @intCast(header.pixeldepth),
+        @intCast(header.arrayelements),
         @intCast(header.glformat),
         @intCast(header.gltype),
         @ptrCast(data.ptr),

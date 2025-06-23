@@ -106,17 +106,44 @@ fn startup() callconv(.c) void {
 
     app.gl.BindVertexArray(vao);
 
-    // This seems like to remove the backgound color of the texture, will have a look.
+    // These two functions remove the background color so that the program
+    // won't draw the hideous rectangle angle at the border of the alien textures.
     app.gl.Enable(app.gl.BLEND);
     app.gl.BlendFunc(app.gl.SRC_ALPHA, app.gl.ONE_MINUS_SRC_ALPHA);
 }
 
-fn render(_: f64) callconv(.c) void {
-    const green: [4]app.gl.float = .{ 0.0, 0.25, 0.0, 1.0 };
-    app.gl.ClearBufferfv(app.gl.COLOR, 0, &green);
+fn render(current_time: f64) callconv(.c) void {
+    const black: [4]app.gl.float = .{ 0.0, 0.0, 0.0, 0.0 };
+    app.gl.ClearBufferfv(app.gl.COLOR, 0, &black);
+    app.gl.Viewport(0, 0, app.info.windowWidth, app.info.windowHeight);
+
+    const t = @as(f32, @floatCast(current_time));
 
     app.gl.UseProgram(program);
-    app.gl.DrawArrays(app.gl.TRIANGLES, 0, 3);
+
+    app.gl.BindBufferBase(app.gl.UNIFORM_BUFFER, 0, rain_buffer);
+
+    const droplet_raw = app.gl.MapBufferRange(app.gl.UNIFORM_BUFFER, 0, RAIN_SIZE * @sizeOf(zm.Vec4f), app.gl.MAP_WRITE_BIT | app.gl.MAP_INVALIDATE_BUFFER_BIT);
+    var droplet = @as([*c]zm.Vec4f, @ptrCast(@alignCast(droplet_raw.?)));
+
+    inline for (0..RAIN_SIZE) |i| {
+        const fmodf_result = std.math.mod(f32, t + @as(f32, @floatFromInt(i)) * droplet_fall_speed[i], 4.31) catch 0;
+
+        droplet[i][0] = droplet_x_offset[i];
+        droplet[i][1] = 2.0 - fmodf_result;
+        droplet[i][2] = t * droplet_rot_speed[i];
+        // I don't understand why don't use vec3 instead of an unused field in the original shader code.
+        // I will try to remove it if I have the time.
+        droplet[i][3] = 0;
+    }
+
+    _ = app.gl.UnmapBuffer(app.gl.UNIFORM_BUFFER);
+
+    inline for (0..RAIN_SIZE) |alien_index| {
+        // This is where the layout (location = 0) does its job
+        app.gl.VertexAttribI1i(0, @intCast(alien_index));
+        app.gl.DrawArrays(app.gl.TRIANGLE_STRIP, 0, 4);
+    }
 }
 
 fn shutdown() callconv(.c) void {

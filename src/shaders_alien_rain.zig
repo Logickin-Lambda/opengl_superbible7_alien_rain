@@ -35,9 +35,9 @@ pub const vertexShaderImpl =
     \\ {   
     \\     // again, generate a plane to draw a texture on it
     \\     const vec2[4] position = vec2[4](vec2(-0.5, -0.5),
-    \\                                      vec2(-0.5, -0.5),
-    \\                                      vec2(-0.5, -0.5),
-    \\                                      vec2(-0.5, -0.5));
+    \\                                      vec2( 0.5, -0.5),
+    \\                                      vec2(-0.5,  0.5),
+    \\                                      vec2( 0.5,  0.5));
     \\     vs_out.tc = position[gl_VertexID].xy + vec2(0.5);
     \\     float co = cos(droplet[alien_index].orientation);
     \\     float so = sin(droplet[alien_index].orientation);
@@ -68,6 +68,6 @@ pub const fragmentShaderImpl =
     \\ 
     \\ void main(void)
     \\ {
-    \\     color = texture(tex_aliens, vec3(fs_in.tc, float(fs_in.alien)));
+    \\      color = texture(tex_aliens, vec3(fs_in.tc, float(fs_in.alien)));
     \\ }
 ;
