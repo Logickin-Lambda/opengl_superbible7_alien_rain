@@ -123,8 +123,8 @@ fn render(current_time: f64) callconv(.c) void {
 
     app.gl.BindBufferBase(app.gl.UNIFORM_BUFFER, 0, rain_buffer);
 
-    const droplet_raw = app.gl.MapBufferRange(app.gl.UNIFORM_BUFFER, 0, RAIN_SIZE * @sizeOf(zm.Vec4f), app.gl.MAP_WRITE_BIT | app.gl.MAP_INVALIDATE_BUFFER_BIT);
-    var droplet = @as([*c]zm.Vec4f, @ptrCast(@alignCast(droplet_raw.?)));
+    const droplet_raw = app.gl.MapBufferRange(app.gl.UNIFORM_BUFFER, 0, RAIN_SIZE * @sizeOf(zm.Vec3f), app.gl.MAP_WRITE_BIT | app.gl.MAP_INVALIDATE_BUFFER_BIT);
+    var droplet = @as([*c]zm.Vec3f, @ptrCast(@alignCast(droplet_raw.?)));
 
     inline for (0..RAIN_SIZE) |i| {
         const fmodf_result = std.math.mod(f32, t + @as(f32, @floatFromInt(i)) * droplet_fall_speed[i], 4.31) catch 0;
@@ -132,9 +132,6 @@ fn render(current_time: f64) callconv(.c) void {
         droplet[i][0] = droplet_x_offset[i];
         droplet[i][1] = 2.0 - fmodf_result;
         droplet[i][2] = t * droplet_rot_speed[i];
-        // I don't understand why don't use vec3 instead of an unused field in the original shader code.
-        // I will try to remove it if I have the time.
-        droplet[i][3] = 0;
     }
 
     _ = app.gl.UnmapBuffer(app.gl.UNIFORM_BUFFER);

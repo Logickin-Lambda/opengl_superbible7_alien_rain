@@ -23,7 +23,6 @@ pub const vertexShaderImpl =
     \\     float x_offset;
     \\     float y_offset;
     \\     float orientation;
-    \\     float unused;  // Why is the original code has this unused field?
     \\ };
     \\
     \\ layout (std140) uniform droplets
