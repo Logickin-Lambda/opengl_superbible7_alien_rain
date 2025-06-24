@@ -98,7 +98,7 @@ fn startup() callconv(.c) void {
     app.gl.BufferData(app.gl.UNIFORM_BUFFER, @sizeOf(zm.Vec4f) * RAIN_SIZE, null, app.gl.DYNAMIC_DRAW);
 
     // This defines the initial speed, orientation, and location.
-    inline for (0..256) |i| {
+    inline for (0..RAIN_SIZE) |i| {
         droplet_x_offset[i] = std.crypto.random.float(f32) * 2 - 1;
         droplet_rot_speed[i] = (std.crypto.random.float(f32) + 0.5) * (@as(f32, @floatFromInt(i % 2)) - 0.5) * 6;
         droplet_fall_speed[i] = std.crypto.random.float(f32) + 0.2;
